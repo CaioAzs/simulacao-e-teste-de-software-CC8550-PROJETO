@@ -1,18 +1,19 @@
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.models import Turma, Aluno
+from app.repositories import TurmaRepository
+from app.exceptions import TurmaNotFoundException
+
 
 def criar_turma_service(turma, db: Session):
+    turma_repo = TurmaRepository(db)
     nova = Turma(nome=turma.nome)
-    db.add(nova)
-    db.commit()
-    db.refresh(nova)
-    return nova
+    return turma_repo.create(nova)
 
 
 def listar_turmas_service(db: Session):
-    turmas = db.query(Turma).all()
+    turma_repo = TurmaRepository(db)
+    turmas = turma_repo.get_all()
     return [
         {
             "id": turma.id,
@@ -32,9 +33,10 @@ def listar_turmas_service(db: Session):
 
 
 def listar_alunos_da_turma_service(id: int, db: Session):
-    turma = db.query(Turma).filter(Turma.id == id).first()
+    turma_repo = TurmaRepository(db)
+    turma = turma_repo.get_by_id(id)
     if not turma:
-        raise HTTPException(status_code=404, detail="Turma não encontrada")
+        raise TurmaNotFoundException(f"Turma com ID {id} não encontrada")
     return turma.alunos
 
 

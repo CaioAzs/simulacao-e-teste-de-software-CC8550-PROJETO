@@ -1,47 +1,46 @@
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.models import Aluno, Turma, Tarefa
+from app.repositories import AlunoRepository, TurmaRepository
+from app.exceptions import AlunoNotFoundException, TurmaNotFoundException
+
 
 def criar_aluno_service(aluno, db: Session):
-    turma = db.query(Turma).filter(Turma.id == aluno.turma_id).first()
+    turma_repo = TurmaRepository(db)
+    turma = turma_repo.get_by_id(aluno.turma_id)
     if not turma:
-        raise HTTPException(status_code=400, detail="Turma não existe")
+        raise TurmaNotFoundException(f"Turma com ID {aluno.turma_id} não encontrada")
 
+    aluno_repo = AlunoRepository(db)
     novo = Aluno(**aluno.dict())
-    db.add(novo)
-    db.commit()
-    db.refresh(novo)
-    return novo
+    return aluno_repo.create(novo)
 
 
 def listar_alunos_service(db: Session):
-    return db.query(Aluno).all()
+    aluno_repo = AlunoRepository(db)
+    return aluno_repo.get_all()
 
 
 def obter_aluno_service(id: int, db: Session):
-    aluno = db.query(Aluno).filter(Aluno.id == id).first()
+    aluno_repo = AlunoRepository(db)
+    aluno = aluno_repo.get_by_id(id)
     if not aluno:
-        raise HTTPException(status_code=404, detail="Aluno não encontrado")
+        raise AlunoNotFoundException(f"Aluno com ID {id} não encontrado")
     return aluno
 
 
 def atualizar_aluno_service(id: int, dados, db: Session):
-    aluno = db.query(Aluno).filter(Aluno.id == id).first()
+    aluno_repo = AlunoRepository(db)
+    aluno = aluno_repo.update(id, **dados.dict())
     if not aluno:
-        raise HTTPException(status_code=404, detail="Aluno não encontrado")
-    for campo, valor in dados.dict().items():
-        setattr(aluno, campo, valor)
-    db.commit()
+        raise AlunoNotFoundException(f"Aluno com ID {id} não encontrado")
     return aluno
 
 
 def deletar_aluno_service(id: int, db: Session):
-    aluno = db.query(Aluno).filter(Aluno.id == id).first()
-    if not aluno:
-        raise HTTPException(status_code=404, detail="Aluno não encontrado")
-    db.delete(aluno)
-    db.commit()
+    aluno_repo = AlunoRepository(db)
+    if not aluno_repo.delete(id):
+        raise AlunoNotFoundException(f"Aluno com ID {id} não encontrado")
     return {"mensagem": "Aluno removido com sucesso"}
 
 
@@ -65,16 +64,17 @@ def alunos_com_mais_tarefas_pendentes_service(db: Session):
 
 
 def criar_alunos_em_lote_service(alunos, db: Session):
+    turma_repo = TurmaRepository(db)
+    aluno_repo = AlunoRepository(db)
     criados = []
+
     for aluno_data in alunos:
-        turma = db.query(Turma).filter(Turma.id == aluno_data.turma_id).first()
+        turma = turma_repo.get_by_id(aluno_data.turma_id)
         if not turma:
-            raise HTTPException(status_code=400, detail=f"Turma {aluno_data.turma_id} não existe")
+            raise TurmaNotFoundException(f"Turma com ID {aluno_data.turma_id} não encontrada")
 
         novo = Aluno(**aluno_data.dict())
-        db.add(novo)
-        criados.append(novo)
-    db.commit()
-    for aluno in criados:
-        db.refresh(aluno)
+        criado = aluno_repo.create(novo)
+        criados.append(criado)
+
     return criados

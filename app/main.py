@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.database import engine, Base
 from app.routers import alunos_router, turmas_router, materias_router, tarefas_router
+from app.models import Aluno, Turma, Materia, Tarefa
 
 app = FastAPI(title="Gestão Escolar API")
 

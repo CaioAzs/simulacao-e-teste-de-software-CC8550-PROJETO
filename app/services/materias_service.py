@@ -1,24 +1,26 @@
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from app.models import Materia, aluno_materia, Aluno
+from app.models import Materia, aluno_materia
+from app.repositories import MateriaRepository, TurmaRepository
+from app.exceptions import MateriaNotFoundException, TurmaNotFoundException, AlunoNotFoundException
+
 
 def criar_materia_service(materia, db: Session):
+    materia_repo = MateriaRepository(db)
     nova = Materia(nome=materia.nome)
-    db.add(nova)
-    db.commit()
-    db.refresh(nova)
-    return nova
+    return materia_repo.create(nova)
 
 
 def listar_materias_service(db: Session):
-    return db.query(Materia).all()
+    materia_repo = MateriaRepository(db)
+    return materia_repo.get_all()
 
 
 def listar_alunos_por_materia_service(id: int, db: Session):
-    materia = db.query(Materia).filter(Materia.id == id).first()
+    materia_repo = MateriaRepository(db)
+    materia = materia_repo.get_by_id(id)
     if not materia:
-        raise HTTPException(status_code=404, detail="Matéria não encontrada")
+        raise MateriaNotFoundException(f"Matéria com ID {id} não encontrada")
     return materia.alunos
 
 
@@ -42,13 +44,22 @@ def listar_materias_mais_populares_service(db: Session):
 
 
 def atribuir_materias_para_turma_service(turma_id: int, dados, db: Session):
-    alunos = db.query(Aluno).filter(Aluno.turma_id == turma_id).all()
-    if not alunos:
-        raise HTTPException(status_code=404, detail="Nenhum aluno encontrado para essa turma")
+    turma_repo = TurmaRepository(db)
+    materia_repo = MateriaRepository(db)
 
-    materias = db.query(Materia).filter(Materia.id.in_(dados.materias_ids)).all()
+    turma = turma_repo.get_by_id(turma_id)
+    if not turma:
+        raise TurmaNotFoundException(f"Turma com ID {turma_id} não encontrada")
+
+    alunos = turma.alunos
+    if not alunos:
+        raise AlunoNotFoundException(f"Nenhum aluno encontrado para a turma {turma_id}")
+
+    materias = [materia_repo.get_by_id(mid) for mid in dados.materias_ids]
+    materias = [m for m in materias if m is not None]
+
     if not materias:
-        raise HTTPException(status_code=404, detail="Nenhuma matéria válida encontrada")
+        raise MateriaNotFoundException("Nenhuma matéria válida encontrada")
 
     for aluno in alunos:
         for materia in materias:
