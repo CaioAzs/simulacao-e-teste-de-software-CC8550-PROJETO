@@ -1,23 +1,23 @@
-# Sistema de Gest�o Escolar - Projeto de Testes
+# Sistema de Gestão Escolar - Projeto de Testes
 
-## Descri��o do Projeto
+## Descrição do Projeto
 
-Sistema de gest�o escolar desenvolvido em Python com FastAPI para gerenciar alunos, turmas, mat�rias e tarefas. O projeto implementa uma API REST completa com opera��es CRUD e utiliza SQLite como banco de dados.
+Sistema de gest�o escolar desenvolvido em Python com FastAPI para gerenciar alunos, turmas, mat�rias e tarefas. O projeto implementa uma API REST completa com operações CRUD e utiliza SQLite como banco de dados.
 
 ## Tecnologias Utilizadas
 
 - **Python 3.13**
-- **FastAPI** - Framework web para cria��o da API REST
-- **SQLAlchemy** - ORM para manipula��o do banco de dados
+- **FastAPI** - Framework web para criação da API REST
+- **SQLAlchemy** - ORM para manipulação do banco de dados
 - **SQLite** - Banco de dados relacional
 - **Pytest** - Framework de testes
-- **Pydantic** - Valida��o de dados
+- **Pydantic** - Validação de dados
 
 ## Arquitetura
 
 O projeto segue uma arquitetura em camadas:
 - **Routers** - Endpoints da API REST
-- **Services** - L�gica de neg�cio
+- **Services** - Lógica de negócio
 - **Repositories** - Acesso aos dados
 - **Models** - Entidades do banco de dados
 - **Exceptions** - Tratamento de erros customizados
@@ -26,18 +26,18 @@ O projeto segue uma arquitetura em camadas:
 
 - Gerenciamento de Alunos (CRUD completo)
 - Gerenciamento de Turmas
-- Gerenciamento de Mat�rias
+- Gerenciamento de Matérias
 - Gerenciamento de Tarefas
-- Cria��o em lote de alunos
+- Criação em lote de alunos
 - Consulta de alunos com mais tarefas pendentes
 
 ## Estrutura de Testes
 
 O projeto implementa diferentes tipos de testes:
 
-1. **Testes Unit�rios** (`tests/unit/`) - 31 testes unit�rios cobrindo reposit�rios e servi�os
-2. **Testes Funcionais** (`tests/functional/`) - 8 testes caixa-preta validando regras de neg�cio
-3. **Testes Espec�ficos** (`tests/type/`) - 2 testes de API REST e 2 testes com Mocks
+1. **Testes Unitários** (`tests/unit/`) - 31 testes unit�rios cobrindo repositórios e serviços
+2. **Testes Funcionais** (`tests/functional/`) - 8 testes caixa-preta validando regras de negócio
+3. **Testes Específicos** (`tests/type/`) - 2 testes de API REST e 2 testes com Mocks
 
 ## Cobertura de Testes
 
