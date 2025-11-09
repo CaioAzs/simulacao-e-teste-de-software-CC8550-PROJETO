@@ -1,23 +1,23 @@
-# Sistema de Gestão Escolar - Projeto de Testes
+# Sistema de Gestï¿½o Escolar - Projeto de Testes
 
-## Descrição do Projeto
+## Descriï¿½ï¿½o do Projeto
 
-Sistema de gestão escolar desenvolvido em Python com FastAPI para gerenciar alunos, turmas, matérias e tarefas. O projeto implementa uma API REST completa com operações CRUD e utiliza SQLite como banco de dados.
+Sistema de gestï¿½o escolar desenvolvido em Python com FastAPI para gerenciar alunos, turmas, matï¿½rias e tarefas. O projeto implementa uma API REST completa com operaï¿½ï¿½es CRUD e utiliza SQLite como banco de dados.
 
 ## Tecnologias Utilizadas
 
 - **Python 3.13**
-- **FastAPI** - Framework web para criação da API REST
-- **SQLAlchemy** - ORM para manipulação do banco de dados
+- **FastAPI** - Framework web para criaï¿½ï¿½o da API REST
+- **SQLAlchemy** - ORM para manipulaï¿½ï¿½o do banco de dados
 - **SQLite** - Banco de dados relacional
 - **Pytest** - Framework de testes
-- **Pydantic** - Validação de dados
+- **Pydantic** - Validaï¿½ï¿½o de dados
 
 ## Arquitetura
 
 O projeto segue uma arquitetura em camadas:
 - **Routers** - Endpoints da API REST
-- **Services** - Lógica de negócio
+- **Services** - Lï¿½gica de negï¿½cio
 - **Repositories** - Acesso aos dados
 - **Models** - Entidades do banco de dados
 - **Exceptions** - Tratamento de erros customizados
@@ -26,23 +26,29 @@ O projeto segue uma arquitetura em camadas:
 
 - Gerenciamento de Alunos (CRUD completo)
 - Gerenciamento de Turmas
-- Gerenciamento de Matérias
+- Gerenciamento de Matï¿½rias
 - Gerenciamento de Tarefas
-- Criação em lote de alunos
+- Criaï¿½ï¿½o em lote de alunos
 - Consulta de alunos com mais tarefas pendentes
 
 ## Estrutura de Testes
 
 O projeto implementa diferentes tipos de testes:
 
-1. **Testes Unitários** (`tests/unit/`) - 31 testes unitários cobrindo repositórios e serviços
-2. **Testes Funcionais** (`tests/functional/`) - 8 testes caixa-preta validando regras de negócio
-3. **Testes Específicos** (`tests/type/`) - 2 testes de API REST e 2 testes com Mocks
+1. **Testes Unitï¿½rios** (`tests/unit/`) - 31 testes unitï¿½rios cobrindo repositï¿½rios e serviï¿½os
+2. **Testes Funcionais** (`tests/functional/`) - 8 testes caixa-preta validando regras de negï¿½cio
+3. **Testes Especï¿½ficos** (`tests/type/`) - 2 testes de API REST e 2 testes com Mocks
 
 ## Cobertura de Testes
 
-- **Total: 43 testes implementados**
-  - 31 testes unitários
-  - 8 testes funcionais (caixa-preta)
-  - 2 testes de API REST
-  - 2 testes com Mocks
+- **Total: 59 testes implementados**
+- **Testes UnitÃ¡rios**: 30 testes
+  - Repositories: 18 testes
+  - Services: 12 testes
+- **Testes de IntegraÃ§Ã£o**: 11 testes
+- **Testes Funcionais**: 10 testes (casos de teste documentados)
+- **Testes Estruturais**: 4 testes (cobertura de branches)
+- **Testes com Mocks**: 2 testes
+- **Testes de API REST**: 2 testes
+
+

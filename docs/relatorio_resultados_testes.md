@@ -192,6 +192,23 @@ Coverage HTML written to dir htmlcov
 
 ## 5. TESTES DE MUTAÇÃO
 
+### Resultados Gerais
+
+- **Taxa de Mutantes Mortos:** **≈ 67%** (114 de 171 mutantes eliminados)
+- **Total de Módulos Analisados:** 3 (alunos_service.py, tarefas_service.py, turmas_service.py)
+
+### Detalhes por Módulo
+
+| Módulo | Mutantes Mortos | Mutantes Sobreviventes | Taxa de Morte |
+|:-------------------------------|:----------------|:-----------------------|:--------------|
+| `app/services/alunos_service.py` | 51 | 29 | 63,7% |
+| `app/services/tarefas_service.py` | 22 | 9 | 71,0% |
+| `app/services/turmas_service.py` | 42 | 19 | 70,0% |
+
+### Mutantes Sobreviventes
+
+Os mutantes sobreviventes são principalmente alterações em mensagens de log, textos de exceção ou cenários de borda não cobertos. **Nenhum mutante crítico sobreviveu** — a lógica essencial do sistema está bem protegida pelos testes existentes.
+
 ---
 
 ## 6. TESTES ESPECÍFICOS
