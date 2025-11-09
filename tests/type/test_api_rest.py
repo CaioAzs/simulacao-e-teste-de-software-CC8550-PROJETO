@@ -4,10 +4,14 @@ Objetivo: Validar endpoints com diferentes métodos HTTP e respostas JSON
 """
 
 import pytest
+import time
 from fastapi.testclient import TestClient
 from app.main import app
 
 client = TestClient(app, raise_server_exceptions=False)
+
+# Timestamp para garantir nomes únicos
+TEST_RUN_ID = int(time.time())
 
 
 class TestHTTPMethods:
@@ -18,7 +22,7 @@ class TestHTTPMethods:
 
     def test_http_methods_on_alunos_endpoint(self):
         # POST - Criar turma e aluno
-        turma_response = client.post("/turmas", json={"nome": "Turma API Test"})
+        turma_response = client.post("/turmas", json={"nome": f"Turma API Test {TEST_RUN_ID}"})
         assert turma_response.status_code == 200
         turma_id = turma_response.json()["id"]
 
@@ -58,12 +62,13 @@ class TestStatusCodesAndJSON:
 
     def test_status_codes_and_json_structure(self):
         # POST - Criar turma (200 OK com JSON)
-        turma_response = client.post("/turmas", json={"nome": "Turma JSON Test"})
+        turma_nome = f"Turma JSON Test {TEST_RUN_ID}"
+        turma_response = client.post("/turmas", json={"nome": turma_nome})
         assert turma_response.status_code == 200
         turma_json = turma_response.json()
         assert "id" in turma_json
         assert "nome" in turma_json
-        assert turma_json["nome"] == "Turma JSON Test"
+        assert turma_json["nome"] == turma_nome
 
         # GET - Listar alunos (200 OK com lista JSON)
         list_response = client.get("/alunos")
