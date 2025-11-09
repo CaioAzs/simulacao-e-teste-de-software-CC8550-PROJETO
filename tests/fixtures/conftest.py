@@ -1,8 +1,11 @@
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.database import Base
+from sqlalchemy.pool import StaticPool
+from fastapi.testclient import TestClient
+from app.database import Base, get_db
 from app.models import Aluno, Turma, Materia, Tarefa
+from app.main import app
 
 
 @pytest.fixture
@@ -64,3 +67,42 @@ def tarefa_sample(db_session, aluno_sample, materia_sample):
     db_session.commit()
     db_session.refresh(tarefa)
     return tarefa
+
+
+@pytest.fixture
+def client():
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(bind=engine)
+    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+    def override_get_db():
+        db = TestingSessionLocal()
+        try:
+            yield db
+        finally:
+            db.close()
+
+    app.dependency_overrides[get_db] = override_get_db
+    app.state._session_factory = TestingSessionLocal
+    try:
+        with TestClient(app) as test_client:
+            yield test_client
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+        app.state.__dict__.pop("_session_factory", None)
+        Base.metadata.drop_all(bind=engine)
+        engine.dispose()
+
+
+@pytest.fixture
+def client_session(client):
+    Session = client.app.state._session_factory
+    session = Session()
+    try:
+        yield session
+    finally:
+        session.close()

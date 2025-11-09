@@ -1,8 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
 from app.database import get_db
-from app.models import Aluno, Turma, Tarefa
 from pydantic import BaseModel
 from app.services.alunos_service import (
     criar_aluno_service,
@@ -21,8 +20,6 @@ class AlunoCreate(BaseModel):
     idade: int
     turma_id: int
     bolsista: bool = False
-
-
 @router.post("")
 def criar_aluno(aluno: AlunoCreate, db: Session = Depends(get_db)):
     return criar_aluno_service(aluno, db)
@@ -31,6 +28,11 @@ def criar_aluno(aluno: AlunoCreate, db: Session = Depends(get_db)):
 @router.get("")
 def listar_alunos(db: Session = Depends(get_db)):
     return listar_alunos_service(db)
+
+
+@router.get("/mais-pendentes")
+def alunos_com_mais_tarefas_pendentes(db: Session = Depends(get_db)):
+    return alunos_com_mais_tarefas_pendentes_service(db)
 
 
 @router.get("/{id}")
@@ -46,11 +48,6 @@ def atualizar_aluno(id: int, dados: AlunoCreate, db: Session = Depends(get_db)):
 @router.delete("/{id}")
 def deletar_aluno(id: int, db: Session = Depends(get_db)):
     return deletar_aluno_service(id, db)
-
-
-@router.get("/mais-pendentes")
-def alunos_com_mais_tarefas_pendentes(db: Session = Depends(get_db)):
-    return alunos_com_mais_tarefas_pendentes_service(db)
 
 
 @router.post("/lote")
