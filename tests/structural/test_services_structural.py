@@ -172,15 +172,16 @@ def test_alunos_cenarios_coletivos(db_session, setup_dados):
     ]
     with pytest.raises(TurmaNotFoundException):
         criar_alunos_em_lote_service(lote_invalido, db_session)
-
     db_session.query(Tarefa).filter(Tarefa.aluno_id == setup_dados["aluno1"].id).update({"concluido": True})
     db_session.commit()
+
     pendentes_vazio = alunos_com_mais_tarefas_pendentes_service(db_session)
-    assert ids[setup_dados["aluno1"].id] >= 1
-    assert any(item["pendentes"] == 0 for item in pendentes_vazio) or all(
-        item["pendentes"] == 0 for item in pendentes_vazio
-    )
-    assert any(item["pendentes"] == 0 for item in pendentes_vazio) or all(item["pendentes"] == 0 for item in pendentes_vazio)
+    if pendentes_vazio:
+        ids_final = {item["id"]: item["pendentes"] for item in pendentes_vazio}
+        assert ids_final.get(setup_dados["aluno1"].id, 0) == 0
+        assert any(item["pendentes"] == 0 for item in pendentes_vazio)
+    else:
+        assert pendentes_vazio == []
 
 
 def test_turmas_branches(db_session, setup_dados):
