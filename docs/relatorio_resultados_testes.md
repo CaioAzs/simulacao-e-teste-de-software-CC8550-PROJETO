@@ -214,41 +214,49 @@ Os mutantes sobreviventes são principalmente alterações em mensagens de log, 
 ## 6. TESTES ESPECÍFICOS
 
 ### Tipos Implementados
+✓ **2 tipos implementados**
 
-#### 6.1 Testes Estruturais (Caixa-Branca)
-**Quantidade**: 4 testes abrangentes
-- `test_crud_aluno_branches` - Cobertura de todos os branches do CRUD
-- `test_alunos_cenarios_coletivos` - Operações em lote e edge cases
-- `test_turmas_branches` - Cobertura completa de turmas
-- `test_tarefas_branches` - Todos os caminhos de tarefas
+---
+
+#### 6.1 Testes de API REST
+**Quantidade**: 2 testes (métodos HTTP e status codes)
+
+**Descrição**: Validação de endpoints REST com diferentes métodos HTTP (GET, POST, PUT, DELETE) e verificação de status codes e estrutura JSON das respostas.
+
+**Testes Implementados**:
+1. `test_http_methods_on_alunos_endpoint` - Validar todos os métodos HTTP
+2. `test_status_codes_and_json_structure` - Validar status codes e JSON
 
 **Exemplo**:
 ```python
-def test_crud_aluno_branches(db_session, setup_dados):
-    # Branch 1: Criação com sucesso
-    criado = criar_aluno_service(novo_dto, db_session)
+def test_http_methods_on_alunos_endpoint(self):
+    # POST - Criar turma e aluno
+    turma_response = client.post("/turmas", json={"nome": f"Turma API Test {TEST_RUN_ID}"})
+    assert turma_response.status_code == 200
 
-    # Branch 2: Listagem
-    alunos = listar_alunos_service(db_session)
+    # POST - Criar aluno
+    post_response = client.post("/alunos", json={"nome": "Teste HTTP", "idade": 16, "turma_id": turma_id})
 
-    # Branch 3: Busca por ID existente
-    obtido = obter_aluno_service(criado.id, db_session)
+    # GET - Buscar aluno
+    get_response = client.get(f"/alunos/{aluno_id}")
 
-    # Branch 4: Atualização
-    atualizado = atualizar_aluno_service(criado.id, atualizado_dto, db_session)
+    # PUT - Atualizar aluno
+    put_response = client.put(f"/alunos/{aluno_id}", json={"nome": "Teste HTTP Atualizado", "idade": 17})
 
-    # Branch 5: Exclusão
-    deletar_aluno_service(criado.id, db_session)
-
-    # Branch 6: Exceção - aluno não encontrado
-    with pytest.raises(AlunoNotFoundException):
-        obter_aluno_service(criado.id, db_session)
+    # DELETE - Remover aluno
+    delete_response = client.delete(f"/alunos/{aluno_id}")
 ```
 
-#### 6.2 Testes com Mocks
-**Quantidade**: 2 testes de isolamento com mocks
-- `test_criar_aluno_with_mock_repository` - Mock completo de dependências
-- `test_criar_aluno_turma_inexistente_with_mock` - Simulação de cenários de erro
+---
+
+#### 6.2 Testes com Mocks e Stubs
+**Quantidade**: 2 testes (isolamento de dependências e cenários)
+
+**Descrição**: Isolamento de dependências externas (banco de dados) e simulação de diferentes cenários de resposta (sucesso e erro) para testar lógica de serviço.
+
+**Testes Implementados**:
+1. `test_criar_aluno_with_mock_repository` - Isolar dependências de banco de dados
+2. `test_criar_aluno_turma_inexistente_with_mock` - Simular cenário de erro (turma não existe)
 
 **Exemplo**:
 ```python
@@ -263,12 +271,18 @@ def test_criar_aluno_with_mock_repository(self):
     mock_turma_repo.get_by_id.return_value = turma_mock
 
     # Simular criação de aluno
-    aluno_criado = Aluno(id=10, nome="Aluno Mock", idade=16)
+    aluno_criado = Aluno(id=10, nome="Aluno Mock", idade=16, turma_id=1, bolsista=False)
     mock_aluno_repo.create.return_value = aluno_criado
 
-    with patch('app.services.alunos_service.TurmaRepository'):
-        resultado = criar_aluno_service(aluno_input, mock_db)
-        assert resultado.id == 10
+    # Patch dos repositórios
+    with patch('app.services.alunos_service.TurmaRepository', return_value=mock_turma_repo):
+        with patch('app.services.alunos_service.AlunoRepository', return_value=mock_aluno_repo):
+            resultado = criar_aluno_service(aluno_input, mock_db)
+
+    # Verificações
+    assert resultado.id == 10
+    mock_turma_repo.get_by_id.assert_called_once_with(1)
+    mock_aluno_repo.create.assert_called_once()
 ```
 
 ---
